@@ -6,22 +6,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Video</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 1100px; margin: 24px auto; padding: 0 16px; }
-        .videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
-        .card { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
-        .card img { width: 100%; height: 145px; object-fit: cover; background: #eee; }
-        .card div { padding: 12px; }
-        .pages { display: flex; gap: 12px; margin: 24px 0; }
-    </style>
 </head>
 <body>
-    <p><a href="<c:url value='/home'/>">Trang chủ</a></p>
     <h1>Video của tôi</h1>
     <c:if test="${empty videos}"><p>Chưa có video đang hoạt động.</p></c:if>
-    <div class="videos">
+    <div class="row row-cols-1 row-cols-md-3 g-3">
         <c:forEach items="${videos}" var="video">
-            <article class="card">
+            <div class="col"><article class="card h-100">
                 <c:choose>
                     <c:when test="${fn:startsWith(video.poster, 'http://') or fn:startsWith(video.poster, 'https://')}">
                         <img src="<c:out value='${video.poster}'/>" alt="Poster video">
@@ -37,7 +28,7 @@
                     <p><c:out value="${video.description}"/></p>
                     <small>Danh mục: <c:out value="${video.category.categoryname}"/> · Lượt xem: <c:out value="${video.views}"/></small>
                 </div>
-            </article>
+            </article></div>
         </c:forEach>
     </div>
 
