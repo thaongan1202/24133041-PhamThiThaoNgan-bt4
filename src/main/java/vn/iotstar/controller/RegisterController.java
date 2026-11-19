@@ -3,6 +3,7 @@ package vn.iotstar.controller;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import vn.iotstar.service.IUserService;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.ValidationUtil;
 
 @WebServlet(urlPatterns = "/register")
 public class RegisterController extends HttpServlet {
@@ -45,6 +47,16 @@ public class RegisterController extends HttpServlet {
         if (isBlank(username) || isBlank(fullname) || isBlank(email) || isBlank(phone)
                 || isBlank(password) || isBlank(repassword)) {
             alert = "Vui lòng nhập đầy đủ thông tin";
+        }  else if (!ValidationUtil.isValidUsername(username)) {
+            alert = "Tài khoản 4-30 ký tự, chỉ gồm chữ, số và dấu gạch dưới";
+        } else if (!ValidationUtil.isValidFullname(fullname)) {
+            alert = "Họ tên từ 2 đến 100 ký tự";
+        } else if (!ValidationUtil.isValidEmail(email)) {
+            alert = "Email không hợp lệ";
+        } else if (!ValidationUtil.isValidPhone(phone)) {
+            alert = "Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0";
+        } else if (!ValidationUtil.isValidPassword(password)) {
+            alert = "Mật khẩu từ 6 đến 50 ký tự";
         } else if (!password.equals(repassword)) {
             alert = "Mật khẩu nhập lại không khớp";
         } else if (service.checkExistEmail(email)) {

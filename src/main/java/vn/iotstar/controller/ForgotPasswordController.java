@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import vn.iotstar.service.IUserService;
 import vn.iotstar.service.impl.UserServiceImpl;
+import vn.iotstar.util.ValidationUtil;
 
 @WebServlet(urlPatterns = { "/forgot-password", "/reset-password" })
 public class ForgotPasswordController extends HttpServlet {
@@ -44,6 +45,8 @@ public class ForgotPasswordController extends HttpServlet {
 
         if (isBlank(email)) {
             alert = "Vui lòng nhập email";
+        } else if (!ValidationUtil.isValidEmail(email)) {
+            alert = "Email không hợp lệ"; 
         } else if (!service.checkExistEmail(email)) {
             alert = "Email chưa được đăng ký";
         } else if (!service.sendOtp(email, "Đặt lại mật khẩu ShoppingJPA")) {
@@ -69,6 +72,10 @@ public class ForgotPasswordController extends HttpServlet {
         String alert = null;
         if (isBlank(otp) || isBlank(password) || isBlank(repassword)) {
             alert = "Vui lòng nhập đầy đủ thông tin";
+        } else if (!ValidationUtil.isValidOtp(otp)) {
+            alert = "Mã OTP gồm 6 chữ số";
+        } else if (!ValidationUtil.isValidPassword(password)) {
+            alert = "Mật khẩu từ 6 đến 50 ký tự";
         } else if (!password.equals(repassword)) {
             alert = "Mật khẩu nhập lại không khớp";
         } else if (!service.resetPassword(email, otp.trim(), password)) {

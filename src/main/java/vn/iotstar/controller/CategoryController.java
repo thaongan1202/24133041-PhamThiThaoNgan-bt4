@@ -85,6 +85,13 @@ public class CategoryController extends HttpServlet {
         } else if (url.contains("/admin/category/update")) {
             int categoryid = Integer.parseInt(req.getParameter("categoryid"));
             String categoryname = req.getParameter("categoryname");
+            String error = validateCategory(categoryname, req.getParameter("status"));
+            if (error != null) {
+                req.setAttribute("cate", cateService.findById(categoryid));
+                req.setAttribute("error", error);
+                req.getRequestDispatcher("/views/admin/category-edit.jsp").forward(req, resp);
+                return;
+            }
             int status = Integer.parseInt(req.getParameter("status"));
             String link = req.getParameter("images");
 
@@ -126,5 +133,12 @@ public class CategoryController extends HttpServlet {
         if (fileName != null && !fileName.startsWith("https")) {
             Files.deleteIfExists(Paths.get(Constant.DIR, fileName));
         }
+    }
+    
+    private String validateCategory(String name, String status) {
+        if (name == null || name.trim().isEmpty()) return "Tên danh mục không được để trống";
+        if (name.trim().length() > 255) return "Tên danh mục tối đa 255 ký tự";
+        if (!"0".equals(status) && !"1".equals(status)) return "Trạng thái không hợp lệ";
+        return null;
     }
 }
