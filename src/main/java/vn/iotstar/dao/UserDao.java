@@ -100,4 +100,27 @@ public class UserDao implements IUserDao {
             em.close();
         }
     }
+    
+    @Override
+    public User findById(int id) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            return em.find(User.class, id);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public User findByPhone(String phone) {
+        EntityManager em = JpaConfig.getEntityManager();
+        try {
+            TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.phone = :phone", User.class);
+            query.setParameter("phone", phone);
+            List<User> list = query.getResultList();
+            return list.isEmpty() ? null : list.get(0);
+        } finally {
+            em.close();
+        }
+    }
 }

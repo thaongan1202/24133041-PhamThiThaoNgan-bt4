@@ -55,6 +55,12 @@ public class User implements Serializable {
 
     @Column(name = "otp", columnDefinition = "nvarchar(10) null")
     private String otp;
+    
+    @Column(name = "pendingemail", columnDefinition = "nvarchar(255) null")
+    private String pendingEmail;
+
+    public String getPendingEmail() { return pendingEmail; }
+    public void setPendingEmail(String pendingEmail) { this.pendingEmail = pendingEmail; }
 
     @Column(name = "otpexpiry")
     private LocalDateTime otpExpiry;

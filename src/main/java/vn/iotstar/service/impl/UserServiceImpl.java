@@ -57,6 +57,70 @@ public class UserServiceImpl implements IUserService {
         userDao.insert(user);
         return true;
     }
+    
+    @Override
+    public User findById(int id) { return userDao.findById(id); }
+
+    @Override
+    public User findByEmail(String email) { return userDao.findByEmail(email); }
+
+    @Override
+    public User findByPhone(String phone) { return userDao.findByPhone(phone); }
+
+    @Override
+    public User updateProfile(int userId, String fullname, String phone, String avatarUrl) {
+        User user = userDao.findById(userId);
+        if (user == null) {
+            return null;
+        }
+        user.setFullname(fullname);
+        user.setPhone(phone);
+        if (avatarUrl != null) {
+            user.setAvatar(avatarUrl);
+        }
+        userDao.update(user);
+        return user;
+    }
+
+    @Override
+    public boolean requestEmailChange(int userId, String newEmail) {
+        User user = userDao.findById(userId);
+        if (user == null) {
+            return false;
+        }
+        String otp = String.format("%06d", new SecureRandom().nextInt(1_000_000));
+        user.setPendingEmail(newEmail);
+        user.setOtp(otp);
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+        userDao.update(user);
+
+        System.out.println("OTP đổi email của " + newEmail + ": " + otp);
+        try {
+            MailUtil.send(newEmail, "Xác nhận email mới ShoppingJPA",
+                    "Mã OTP của bạn là: " + otp + "\nMã có hiệu lực trong 5 phút.");
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean confirmEmailChange(int userId, String otp) {
+        User user = userDao.findById(userId);
+        if (user == null || user.getPendingEmail() == null || !otpValid(user, otp)) {
+            return false;
+        }
+        if (userDao.checkExistEmail(user.getPendingEmail())) {
+            return false;
+        }
+        user.setEmail(user.getPendingEmail());
+        user.setPendingEmail(null);
+        user.setOtp(null);
+        user.setOtpExpiry(null);
+        userDao.update(user);
+        return true;
+    }
 
     @Override
     public boolean sendOtp(String email, String subject) {
